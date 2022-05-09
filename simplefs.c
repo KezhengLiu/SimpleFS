@@ -5,10 +5,15 @@
 #include <linux/namei.h>
 #include <linux/cred.h>
 #include <linux/mount.h>
+
+
 //每个文件系统需要一个MAGIC number
 #define AUFS_MAGIC  0x64668735
 //aufs文件系统的挂载点
 static struct vfsmount *aufs_mount;
+
+
+
 //根据创建的aufs文件系统的 super_block创建具体的inode结构体
 static struct inode *aufs_get_inode(struct super_block *sb, int mode,
                 dev_t dev)
@@ -40,6 +45,7 @@ static struct inode *aufs_get_inode(struct super_block *sb, int mode,
  
     return inode;
 }
+
 //把创建的inode和dentry结构体连接起来
 static int aufs_mknod(struct inode *dir, struct dentry *dentry, int mode, dev_t dev)
 {
@@ -74,6 +80,7 @@ static int aufs_create(struct inode *dir, struct dentry *dentry, int mode)
 {
     return aufs_mknod(dir, dentry, mode | S_IFREG, 0);
 }
+
 //根据父dentry、mode、name创建子dentry
 static int aufs_create_by_name(const char *name, mode_t mode,
         struct dentry *parent, struct dentry **dentry)
@@ -156,11 +163,15 @@ static ssize_t aufs_file_write(struct file *file, const char __user *buffer, siz
  
     return count;
 }
+
+
 //对应具体打开文件的文件操作方式
 static struct file_operations aufs_file_operations = {
     .read = aufs_file_read,
     .write = aufs_file_write,
 };
+
+
 //用于填充aufs的super_block
 static int aufs_fill_super(struct super_block *sb, void *data, int silent)
 {
@@ -174,12 +185,15 @@ static struct dentry *aufs_get_sb(struct file_system_type *fs_type,
 {
     return mount_single(fs_type, flags, data, aufs_fill_super);
 }
+
 //初始化aufs文件系统的 file_system_type结构，每个文件系统对应一个这样的结构体，主要用于提供具体文件系统的//的信息，以及操作的方法
 static struct file_system_type aufs_type = {
     .name = "aufs",
     .mount = aufs_get_sb,
     .kill_sb = kill_litter_super,
 };
+
+
 //创建aufs文件系统，同时创建对应的文件夹和文件
 static int __init aufs_init(void)
 {
@@ -222,6 +236,7 @@ static void __exit aufs_exit(void)
  
 module_init(aufs_init);
 module_exit(aufs_exit);
+
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("This is a simple module");
 MODULE_VERSION("Ver 0.1");
