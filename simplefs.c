@@ -92,7 +92,7 @@ static int aufs_create_by_name(const char *name, mode_t mode,
     }
  
     *dentry = NULL;
-    spin_lock(&parent->d_inode->i_lock);
+    inode_lock(parent->d_inode);
     *dentry = lookup_one_len(name, parent, strlen(name));
     if (!IS_ERR(dentry)) {
         if ((mode & S_IFMT) == S_IFDIR)
@@ -101,7 +101,7 @@ static int aufs_create_by_name(const char *name, mode_t mode,
             error = aufs_create(parent->d_inode, *dentry, mode);
     } else
         error = PTR_ERR(dentry);
-    spin_unlock(&parent->d_inode->i_lock);
+    inode_unlock(parent->d_inode);
  
     return error;
 }
